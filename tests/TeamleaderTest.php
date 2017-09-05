@@ -6,6 +6,8 @@
 
 namespace SumoCoders\Teamleader\tests;
 
+require __DIR__ . '/../vendor/autoload.php';
+
 spl_autoload_register(function ($class) {
     $parts = explode('\\', $class);
     if ($parts[0] == 'SumoCoders' && $parts[1] == 'Teamleader') {
@@ -22,6 +24,7 @@ spl_autoload_register(function ($class) {
 
 require_once 'config.php';
 
+use PHPUnit\Framework\TestCase;
 use SumoCoders\Teamleader\Teamleader;
 use SumoCoders\Teamleader\Crm\Contact;
 use SumoCoders\Teamleader\Crm\Company;
@@ -33,7 +36,7 @@ use SumoCoders\Teamleader\Invoices\CreditnoteLine;
 use SumoCoders\Teamleader\Subscriptions\Subscription;
 use SumoCoders\Teamleader\Subscriptions\SubscriptionLine;
 
-class TeamleaderTest extends \PHPUnit_Framework_TestCase
+class TeamleaderTest extends TestCase
 {
     /**
      * @var Teamleader
@@ -72,9 +75,9 @@ class TeamleaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetUserAgent()
     {
-        $this->teamleader->setUserAgent('testing/1.0.0');
+        $this->teamleader->setUserAgent('testing/1.10.0-underlined');
         $this->assertEquals(
-            'PHP Teamleader/' . Teamleader::VERSION . ' testing/1.0.0',
+            'PHP Teamleader/' . Teamleader::VERSION . ' testing/1.10.0-underlined',
             $this->teamleader->getUserAgent()
         );
     }

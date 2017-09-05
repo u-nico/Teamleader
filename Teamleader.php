@@ -6,6 +6,7 @@ use SumoCoders\Teamleader\Calls\Call;
 use SumoCoders\Teamleader\Crm\Contact;
 use SumoCoders\Teamleader\Crm\Company;
 use SumoCoders\Teamleader\Crm\Relationship;
+use SumoCoders\Teamleader\CustomFields\CustomFieldOption;
 use SumoCoders\Teamleader\Invoices\Invoice;
 use SumoCoders\Teamleader\Invoices\Creditnote;
 use SumoCoders\Teamleader\Subscriptions\Subscription;
@@ -30,13 +31,19 @@ class Teamleader
     const DEBUG = false;
 
     // base endpoint
-    const API_URL = 'https://www.teamleader.be/api';
+    const API_URL = 'https://app.teamleader.eu/api';
 
     // port
     const API_PORT = 443;
 
-    // current version
-    const VERSION = '1.0.0';
+    /*
+     * The current version of the wrapper
+     * The latest version of the original repo can be found here: https://github.com/sumocoders/Teamleader/releases
+     * The latest version of our fork can be found here: https://github.com/u-nico/Teamleader/releases
+     *
+     * This particular version contains some changes made to the stable 1.10.0 version.
+     */
+    const VERSION = '1.10.0-underlined';
 
     /**
      * The apiGroup to use
@@ -778,7 +785,7 @@ class Teamleader
      * Fetch information about custom field
      *
      * @param  string   $for custom field type
-     * @return CustomField
+     * @return array CustomField
      */
     public function crmGetCustomField($for)
     {
@@ -790,7 +797,26 @@ class Teamleader
 
         if (!empty($rawData)) {
             foreach ($rawData as $row) {
-                $return[] = CustomField::initializeWithRawData($row);
+                $customField = CustomField::initializeWithRawData($row);
+                if ($customField->getType() == "set" || $customField->getType() == "enum") {
+                    $options = [];
+
+                    // Request options from the server
+                    $rawFieldInfo = $this->doCall(
+                        'getCustomFieldInfo.php',
+                        ["custom_field_id" => $customField->getId()]
+                    );
+                    // Check if the new fields aren't empty
+                    if (!empty($rawFieldInfo)) {
+                        foreach ($rawFieldInfo["options"] as $id => $value) {
+                            $options[] = new CustomFieldOption($id, $value);
+                        }
+                    }
+                    // Set the options on the custom field
+                    $customField->setOptions($options);
+                }
+
+                $return[] = $customField;
             }
         }
         return $return;
