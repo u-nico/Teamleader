@@ -6,6 +6,7 @@ namespace SumoCoders\Teamleader\CustomFields;
  * CustomField class
  *
  * @author         Ricardo Garcia Fernandez <ricardogarfe@gmail.com>
+ * @author         Nico Verbruggen <nico@underlined.be>
  */
 class CustomField
 {
@@ -33,6 +34,11 @@ class CustomField
      * @var string
      */
     private $group;
+
+    /**
+     * @var array
+     */
+    private $options;
 
     /**
      * @param string $id
@@ -115,6 +121,22 @@ class CustomField
     }
 
     /**
+     * @param $options
+     */
+    public function setOptions($options)
+    {
+        $this->options = $options;
+    }
+
+    /**
+     * @return array
+     */
+    public function getOptions()
+    {
+        return $this->options;
+    }
+
+    /**
      * Initialize a CustomField with raw data we got from the API
      *
      * @param  array   $data
@@ -123,7 +145,7 @@ class CustomField
     public static function initializeWithRawData($data)
     {
         $item = new CustomField();
-        
+
         foreach ($data as $key => $value) {
             switch ($key) {
                 case 'id':
