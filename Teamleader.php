@@ -799,15 +799,20 @@ class Teamleader
             foreach ($rawData as $row) {
                 $customField = CustomField::initializeWithRawData($row);
                 if ($customField->getType() == "set" || $customField->getType() == "enum") {
+                    $options = [];
+
                     // Request options from the server
                     $rawFieldInfo = $this->doCall(
                         'getCustomFieldInfo.php',
                         ["custom_field_id" => $customField->getId()]
                     );
-                    $options = [];
-                    foreach ($rawFieldInfo["options"] as $id => $value) {
-                        $options[] = new CustomFieldOption($id, $value);
+                    // Check if the new fields aren't empty
+                    if (!empty($rawFieldInfo)) {
+                        foreach ($rawFieldInfo["options"] as $id => $value) {
+                            $options[] = new CustomFieldOption($id, $value);
+                        }
                     }
+                    // Set the options on the custom field
                     $customField->setOptions($options);
                 }
 
